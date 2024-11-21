@@ -1,0 +1,16 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load the data
+data = pd.read_csv('supermarket_sales.csv')
+
+# Convert 'Date' to datetime
+data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%Y')
+
+# Add 'Month' and 'Day of Week' columns
+data['Month'] = data['Date'].dt.month
+data['Day of Week'] = data['Date'].dt.day_name()
+
+# Convert numeric columns to appropriate types
+numeric_columns = ['Unit price', 'Quantity', 'Tax 5%', 'Total', 'cogs', 'gross income', 'Rating']
+data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, errors='coerce')
