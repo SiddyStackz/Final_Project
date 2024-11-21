@@ -1,16 +1,24 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# Load the data
-data = pd.read_csv('supermarket_sales.csv')
+file_path = 'your_file_path_here.xlsx'  # Replace with the actual file path
+data_raw = pd.read_excel(file_path, header=None)  # Load without headers
 
-# Convert 'Date' to datetime
-data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%Y')
+# Extract column names from the first row
+column_names = data_raw.iloc[0, 0].split(",")  # Split the first row by commas to get column names
 
-# Add 'Month' and 'Day of Week' columns
-data['Month'] = data['Date'].dt.month
-data['Day of Week'] = data['Date'].dt.day_name()
+# Extract data from subsequent rows
+data = data_raw.iloc[1:, 0].str.split(",", expand=True)  # Split each row by commas into columns
 
-# Convert numeric columns to appropriate types
+# Assign column names
+data.columns = column_names
+
+# Convert relevant columns to numeric (if applicable)
 numeric_columns = ['Unit price', 'Quantity', 'Tax 5%', 'Total', 'cogs', 'gross income', 'Rating']
 data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, errors='coerce')
+
+# Convert date column to datetime
+data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%Y')
+
+# Add new columns for analysis
+data['Month'] = data['Date'].dt.month
+data['Day of Week'] = data['Date'].dt.day_name()
