@@ -1,24 +1,18 @@
 import pandas as pd
 
-file_path = 'your_file_path_here.xlsx'  # Replace with the actual file path
-data_raw = pd.read_excel(file_path, header=None)  # Load without headers
+file_path = 'supermarket_sales - Sheet1.csv.xls'  
+data_raw = pd.read_excel(file_path, header=None)  
 
-# Extract column names from the first row
-column_names = data_raw.iloc[0, 0].split(",")  # Split the first row by commas to get column names
+column_names = data_raw.iloc[0, 0].split(",")  
 
-# Extract data from subsequent rows
 data = data_raw.iloc[1:, 0].str.split(",", expand=True)  # Split each row by commas into columns
 
-# Assign column names
 data.columns = column_names
 
-# Convert relevant columns to numeric (if applicable)
 numeric_columns = ['Unit price', 'Quantity', 'Tax 5%', 'Total', 'cogs', 'gross income', 'Rating']
 data[numeric_columns] = data[numeric_columns].apply(pd.to_numeric, errors='coerce')
 
-# Convert date column to datetime
 data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%Y')
 
-# Add new columns for analysis
 data['Month'] = data['Date'].dt.month
 data['Day of Week'] = data['Date'].dt.day_name()
