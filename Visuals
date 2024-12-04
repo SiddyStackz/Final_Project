@@ -1,0 +1,68 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+file_path = '/Users/creatographer/amazon.csv'
+data_csv = pd.read_csv(file_path)
+
+data_csv['discounted_price'] = data_csv['discounted_price'].str.replace(',', '').str.replace('₹', '').astype(float)
+data_csv['actual_price'] = data_csv['actual_price'].str.replace(',', '').str.replace('₹', '').astype(float)
+data_csv['discount_percentage'] = data_csv['discount_percentage'].str.replace('%', '').astype(float)
+data_csv['rating'] = pd.to_numeric(data_csv['rating'], errors='coerce')
+
+# Graph 1: Total Revenue by Category
+threshold = 0.01 * data_csv['discounted_price'].sum()
+category_revenue = data_csv.groupby('category')['discounted_price'].sum()
+category_revenue = category_revenue.sort_values(ascending=False)
+category_revenue['Others'] = category_revenue[category_revenue < threshold].sum()
+category_revenue = category_revenue[category_revenue >= threshold]
+
+plt.figure(figsize=(12, 6))
+category_revenue.sort_values(ascending=False).plot(kind='bar', color='skyblue')
+plt.title('Total Revenue by Category', fontsize=16)
+plt.xlabel('Category', fontsize=12)
+plt.ylabel('Total Revenue (₹)', fontsize=12)
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+
+# Graph 2: Discount Percentage Distribution
+plt.figure(figsize=(10, 6))
+sns.histplot(data_csv['discount_percentage'], bins=20, kde=True, color='green')
+plt.title('Discount Percentage Distribution', fontsize=16)
+plt.xlabel('Discount Percentage (%)', fontsize=12)
+plt.ylabel('Frequency', fontsize=12)
+plt.grid()
+plt.show()
+
+# Graph 3: Rating Distribution
+plt.figure(figsize=(10, 6))
+sns.histplot(data_csv['rating'], bins=10, kde=True, color='orange')
+plt.title('Rating Distribution', fontsize=16)
+plt.xlabel('Rating', fontsize=12)
+plt.ylabel('Frequency', fontsize=12)
+plt.grid()
+plt.show()
+
+# Graph 4: Correlation Between Discount and Rating
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='discount_percentage', y='rating', data=data_csv, alpha=0.6, color='blue')
+plt.title('Discount Percentage vs. Rating', fontsize=16)
+plt.xlabel('Discount Percentage (%)', fontsize=12)
+plt.ylabel('Rating', fontsize=12)
+plt.grid()
+plt.show()
+
+# Graph 5: Top 10 Products by Revenue
+top_products = data_csv.groupby('product_name')['discounted_price'].sum().sort_values(ascending=False).head(10)
+
+plt.figure(figsize=(12, 6))
+top_products.plot(kind='bar', color='purple')
+plt.title('Top 10 Products by Revenue', fontsize=16)
+plt.xlabel('Product Name', fontsize=12)
+plt.ylabel('Total Revenue (₹)', fontsize=12)
+plt.xticks(rotation=45, ha='right', fontsize=10, wrap=True)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
